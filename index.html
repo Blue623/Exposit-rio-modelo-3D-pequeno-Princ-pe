@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O Pequeno Príncipe - Realidade Aumentada</title>
+
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Trilha Sonora em Loop -->
+  <audio id="bg-music" loop src="./assets/musica_ambiente.mp3"></audio>
+
+  <!-- Ações Rápidas no Topo Esquerdo -->
+  <aside class="quick-actions">
+    <button id="audio-toggle" class="glass-btn-icon" title="Ativar/Desativar música">
+      <span id="audio-icon">🔇</span>
+    </button>
+    <button id="qr-trigger" class="glass-btn-icon" title="Abrir no Celular">
+      <span>📱</span>
+    </button>
+  </aside>
+
+  <!-- Cabeçalho -->
+  <header class="story-header">
+    <h1>O PEQUENO PRÍNCIPE</h1>
+    <p>Uma experiência em Realidade Aumentada</p>
+  </header>
+
+  <!-- Menu Suspenso de Seleção de Cena -->
+  <div class="selector-container">
+    <label for="model-select">Escolha a Cena:</label>
+    <select id="model-select">
+      <option value="./assets/livro.glb">Livro Pop-up</option>
+      <option value="./assets/LP.glb">O Pequeno Príncipe</option>
+      <option value="./assets/rosa.glb">A Rosa</option>
+      <option value="./assets/raposa.glb">A Raposa</option>
+    </select>
+  </div>
+
+  <!-- Visualizador 3D -->
+  <!-- Visualizador 3D -->
+  <model-viewer 
+    id="viewer"
+    src="./assets/storybookchallenge_-_the_little_prince.glb"
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    camera-controls 
+    autoplay
+    animation-name="*"
+    bounds="tight"
+    camera-orbit="auto auto auto"
+    shadow-intensity="1.2" 
+    shadow-softness="0.7"
+    exposure="1.05"
+    tone-mapping="neutral">
+
+    <!-- Tela de Carregamento Estilizada -->
+    <div slot="poster" class="loading-overlay">
+      <div class="loader-spinner"></div>
+      <p>Desenhando as estrelas...</p>
+    </div>
+
+    <!-- O botão de AR fica no slot oficial dele -->
+    <button slot="ar-button" id="ar-button">
+      <span>✦</span> Explorar no seu Mundo
+    </button>
+
+  </model-viewer>
+
+  <!-- Container inferior com os Versos (agora fora do model-viewer, visível em PC e Mobile) -->
+  <div class="bottom-container">
+    <div class="quote-card">
+      <span id="quote-text">“Todas as pessoas grandes foram um dia crianças — mas poucas se lembram disso.”</span>
+    </div>
+  </div>
+  <!-- Modal do QR Code para Acesso Mobile -->
+  <div id="qr-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <button id="close-modal" class="close-btn">&times;</button>
+      <h3>✦ Experiência em RA</h3>
+      <p>Aponte a câmera do seu celular para o QR Code abaixo:</p>
+      <div class="qr-frame">
+        <img id="qr-image" alt="QR Code para Realidade Aumentada" />
+      </div>
+      <small>Abra o link para projetar o modelo no seu ambiente real.</small>
+    </div>
+  </div>
+
+  <script>
+    // Dicionário com os versos da obra para cada cena
+    const storyQuotes = {
+      "./assets/storybookchallenge_-_the_little_prince.glb": "“Todas as pessoas grandes foram um dia crianças — mas poucas se lembram disso.”",
+      "./assets/LP.glb": "“É bem mais difícil julgar a si mesmo do que julgar os outros.”",
+      "./assets/rosa_b612.glb": "“Foi o tempo que dedicaste à tua rosa que a fez tão importante.”",
+      "./assets/raposa.glb": "“Tu te tornas eternamente responsável por aquilo que cativas.”"
+    };
+
+    const modelViewer = document.querySelector("#viewer");
+    const modelSelect = document.querySelector("#model-select");
+    const quoteText = document.querySelector("#quote-text");
+
+    // 1. Troca Dinâmica do Modelo e do Verso com Transição Fade
+    modelSelect.addEventListener("change", (event) => {
+      const selectedModel = event.target.value;
+      if (selectedModel) {
+        modelViewer.src = selectedModel;
+
+        if (quoteText && storyQuotes[selectedModel]) {
+          quoteText.style.opacity = "0";
+          setTimeout(() => {
+            quoteText.textContent = storyQuotes[selectedModel];
+            quoteText.style.opacity = "1";
+          }, 250);
+        }
+      }
+    });
+
+    // 2. Controle de Áudio Ambiente
+    const audio = document.getElementById("bg-music");
+    const audioBtn = document.getElementById("audio-toggle");
+    const audioIcon = document.getElementById("audio-icon");
+
+    audioBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play().then(() => {
+          audioIcon.textContent = "🔊";
+        }).catch(() => {
+          console.warn("Áudio não encontrado em assets/musica_tema.mp3 ou bloqueado pelo navegador.");
+        });
+      } else {
+        audio.pause();
+        audioIcon.textContent = "🔇";
+      }
+    });
+
+    // 3. Gerador e Modal do QR Code
+    const qrModal = document.getElementById("qr-modal");
+    const qrTrigger = document.getElementById("qr-trigger");
+    const closeModal = document.getElementById("close-modal");
+    const qrImage = document.getElementById("qr-image");
+
+    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.href)}`;
+
+    qrTrigger.addEventListener("click", () => qrModal.classList.remove("hidden"));
+    closeModal.addEventListener("click", () => qrModal.classList.add("hidden"));
+    qrModal.addEventListener("click", (e) => {
+      if (e.target === qrModal) qrModal.classList.add("hidden");
+    });
+  </script>
+
+</body>
+</html>

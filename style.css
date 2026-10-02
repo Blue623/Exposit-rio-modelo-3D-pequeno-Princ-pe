@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Playfair Display', Georgia, serif;
+  background: radial-gradient(circle at 50% 30%, #172445 0%, #0c142b 60%, #060914 100%);
+  color: #f7eed7;
+}
+
+/* Camada suave de estrelas ao fundo */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(1.5px 1.5px at 15% 15%, rgba(255, 235, 180, 0.8) 50%, transparent),
+    radial-gradient(1px 1px at 35% 25%, rgba(255, 255, 255, 0.6) 50%, transparent),
+    radial-gradient(2px 2px at 70% 12%, rgba(255, 240, 190, 0.9) 50%, transparent),
+    radial-gradient(1.5px 1.5px at 85% 35%, rgba(255, 255, 255, 0.7) 50%, transparent),
+    radial-gradient(1px 1px at 50% 80%, rgba(255, 245, 200, 0.5) 50%, transparent),
+    radial-gradient(2px 2px at 20% 75%, rgba(255, 230, 170, 0.8) 50%, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Visualizador 3D */
+model-viewer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* Botões de Ação no Topo Esquerdo */
+.quick-actions {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  gap: 10px;
+  z-index: 30;
+}
+
+.glass-btn-icon {
+  background: rgba(12, 20, 43, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 167, 84, 0.35);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #f7eed7;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glass-btn-icon:hover {
+  border-color: #f8e4b7;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(212, 167, 84, 0.5);
+}
+
+/* Cabeçalho */
+.story-header {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+  width: 90%;
+  max-width: 460px;
+}
+
+.story-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  color: #f8e4b7;
+  text-shadow: 0 0 12px rgba(248, 228, 183, 0.4);
+  margin-bottom: 4px;
+}
+
+.story-header p {
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #c9d4ea;
+  opacity: 0.85;
+}
+
+/* Menu Suspenso reposicionado no canto superior direito */
+.selector-container {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  background: rgba(12, 20, 43, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 167, 84, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.selector-container label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 1.2px;
+  color: #ffeaad;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px rgba(255, 234, 173, 0.3);
+}
+
+#model-select {
+  background: rgba(10, 16, 35, 0.95);
+  color: #f7eed7;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.88rem;
+  padding: 8px 14px;
+  border: 1px solid rgba(212, 167, 84, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+#model-select:hover, #model-select:focus {
+  border-color: #f8e4b7;
+  box-shadow: 0 0 10px rgba(212, 167, 84, 0.3);
+}
+
+#model-select option {
+  background-color: #0c142b;
+  color: #f7eed7;
+  font-family: sans-serif;
+}
+
+/* Poster de Carregamento */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #172445 0%, #060914 100%);
+  color: #f8e4b7;
+  font-family: 'Cinzel', serif;
+  gap: 16px;
+  z-index: 5;
+}
+
+.loader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(248, 228, 183, 0.2);
+  border-top-color: #d4a754;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Área inferior com Citação e Botão de AR */
+.bottom-container {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  width: 90%;
+  max-width: 460px;
+}
+
+.quote-card {
+  background: rgba(14, 22, 45, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(248, 228, 183, 0.25);
+  border-radius: 12px;
+  padding: 10px 18px;
+  text-align: center;
+  color: #ecdab9;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  width: 100%;
+}
+
+#quote-text {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-style: italic;
+  transition: opacity 0.25s ease-in-out;
+}
+
+#ar-button {
+  background: linear-gradient(135deg, #d4a754 0%, #b8862d 100%);
+  color: #121829;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid #ffeaad;
+  border-radius: 35px;
+  padding: 14px 30px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(212, 167, 84, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+#ar-button:hover {
+  background: linear-gradient(135deg, #e4b863 0%, #ca9638 100%);
+  box-shadow: 0 8px 24px rgba(212, 167, 84, 0.55);
+  transform: scale(1.03);
+}
+
+/* Modal do QR Code */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 9, 20, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-box {
+  background: #0f1833;
+  border: 1px solid rgba(212, 167, 84, 0.4);
+  border-radius: 18px;
+  padding: 24px 28px;
+  text-align: center;
+  position: relative;
+  max-width: 340px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.modal-box h3 {
+  font-family: 'Cinzel', serif;
+  color: #f8e4b7;
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+
+.modal-box p {
+  font-size: 0.88rem;
+  color: #c9d4ea;
+  margin-bottom: 16px;
+}
+
+.qr-frame {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.qr-frame img {
+  display: block;
+  width: 170px;
+  height: 170px;
+}
+
+.modal-box small {
+  display: block;
+  font-size: 0.75rem;
+  color: #ffeaad;
+  opacity: 0.8;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #f8e4b7;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+/* Adaptações para Celulares */
+@media (max-width: 768px) {
+  .story-header {
+    top: 70px;
+  }
+
+  .quick-actions {
+    top: 16px;
+    left: 16px;
+  }
+
+  .selector-container {
+    top: 16px;
+    right: 16px;
+  }
+
+  #qr-trigger {
+    display: none;
+  }
+}
